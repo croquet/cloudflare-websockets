@@ -1,0 +1,12 @@
+name = "websocket-ingress-test"
+main = "index.js"
+compatibility_date = "2024-01-29"
+
+[durable_objects]
+bindings = [
+  { name = "DO", class_name = "DO" },
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["DO"]

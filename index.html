@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Connecting Speed</title>
+</head>
+<body>
+    <h1>WebSocket Connecting Speed</h1>
+    <p>Delay: {{DELAY}}ms [
+        <a href="?delay=0">0</a>
+        <a href="?delay=100">100</a>
+        <a href="?delay=200">200</a>
+        <a href="?delay=500">500</a>
+        <a href="?delay=1000">1000</a>
+    ]</p>
+
+    <script>
+        const N = 50;
+
+        const conns = document.createElement('p');
+        document.body.appendChild(conns);
+        let connections = [];
+        let start = Date.now();
+        for (let i = 1; i <= N; i++) {
+            let label = `${i}: connecting...`;
+            const div = document.createElement('div');
+            div.textContent = label;
+            document.body.appendChild(div);
+
+            let t = Date.now();
+            const websocket = new WebSocket("{{WS_URL}}");
+            websocket.onopen = function() {
+                label = `${i}: connected after ${((Date.now() - t) / 1000).toFixed(1)}s `;
+                div.textContent = label;
+                document.body.appendChild(div);
+                connections.push(websocket);
+                conns.textContent = `Connections per second: ${(connections.length / ((Date.now() - start) / 1000)).toFixed(1)}`;
+                if (connections.length === N) {
+                    for (const ws of connections) ws.send("close");
+                }
+            };
+            websocket.onmessage = function(event) {
+                div.textContent = label + event.data;
+            };
+            websocket.onclose = function() {
+                div.textContent = label + "(closed)";
+            };
+        }
+    </script>
+</body>
+</html>
